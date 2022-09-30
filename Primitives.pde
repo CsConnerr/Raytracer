@@ -25,38 +25,54 @@ class Sphere implements SceneObject
         {
           return result;
         }
+        //if x is equal to the radius, exactly one tangential hit
+        if(x == this.radius)
+        {
+            //t1 = t2 = tp
+            PVector entry = PVector.add(o,PVector.mult(d,tp));
+            PVector entrynorm = PVector.sub(entry,this.center).normalize();
+            result.add(new RayHit(tp,entry,entrynorm,true,this.material,0,0));
+            return result;
+        }
         
         //if x isn't greater than radius...
         float t1 = tp - sqrt(pow(this.radius,2) - pow(x,2));
         float t2 = tp + sqrt(pow(this.radius,2) - pow(x,2));
         
+        //it hits, but its behind the camera, so we dont care
         if(t1 < 0 && t2 < 0)
         {
-          //behind camera, don't care
           return result;
         }
-        
+        //it hits, but we are within the sphere
         else if(t1 < 0 || t2 < 0)
         {
-          //return one hit value t2 is hit value, inside sphere
-          //PVector location = PVector.add(o,PVector.mult());
+          if(t1 < 0)
+          {
+            PVector entry = PVector.add(o,PVector.mult(d,t2));
+            PVector entrynorm = PVector.sub(entry,this.center).normalize();
+            result.add(new RayHit(t2,entry,entrynorm,true,this.material,0,0));
+            return result;
+          }
+          else
+          {
+            PVector entry = PVector.add(o,PVector.mult(d,t1));
+            PVector entrynorm = PVector.sub(entry,this.center).normalize();
+            result.add(new RayHit(t2,entry,entrynorm,true,this.material,0,0));
+            return result;  
+          }
         }
-        
+        //it's a standard hit with entry and exit
         else
         {
-            //it's a hit
-            //t1 is entry
             PVector entry = PVector.add(o,PVector.mult(d,t1));
             PVector exit = PVector.add(o,PVector.mult(d,t2));
             PVector entrynorm = PVector.sub(entry,this.center).normalize();
             PVector exitnorm = PVector.sub(exit,this.center).normalize();
             result.add(new RayHit(t1,entry,entrynorm,true,this.material,0,0));
             result.add(new RayHit(t2,exit,exitnorm,false,this.material,0,0));
+            return result;
         }
-        
-        
-        // TODO: Step 2: implement ray-sphere intersections
-        return result;
     }
 }
 
