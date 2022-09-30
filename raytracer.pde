@@ -139,7 +139,7 @@ class RayTracer
       float w = width;
       float h = height;
       float u = ((x*1.0)/w) - 0.5;
-      float v = ((y*1.0)/h) - 0.5;
+      float v = -(((y*1.0)/h) - 0.5);
       PVector projection = new PVector(u*w, w/2, v*h).normalize();
       PVector direction = PVector.sub(projection, origin);
       Ray ray = new Ray(origin, direction);
