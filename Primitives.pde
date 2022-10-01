@@ -91,15 +91,45 @@ class Plane implements SceneObject
        this.normal = normal.normalize();
        this.material = material;
        this.scale = scale;
-       
-       // remove this line when you implement planes
-       throw new NotImplementedException("Planes not implemented yet");
     }
     
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
-        return result;
+        PVector d = r.direction;
+        PVector o = r.origin;
+        float dir = PVector.dot(d,this.normal);
+        float numerator = PVector.dot(PVector.sub(this.center, o),this.normal);
+        
+        //ray is orthogonal to the plane, no hit
+        if(dir == 0)
+        {
+          return result;
+        }
+        
+        float t = numerator/dir;
+        //ray will never hit the plane, facing the other way.
+        if (t < 0)
+        {
+          return result;
+        }
+        //it hits
+        else
+        {
+          PVector location = PVector.add(o, PVector.mult(d, t));
+          if(dir <= 0)
+          {
+            //entry
+            result.add(new RayHit(t, location, this.normal, true, this.material, 0, 0));
+            return result;
+          }
+          else
+          {
+            //exit
+            result.add(new RayHit(t, location, PVector.mult(this.normal, -1), false, this.material, 0, 0));
+            return result;
+          }
+        }
     }
 }
 
