@@ -154,16 +154,70 @@ class Triangle implements SceneObject
        this.tex3 = tex3;
        this.normal = PVector.sub(v2, v1).cross(PVector.sub(v3, v1)).normalize();
        this.material = material;
-       
-       // remove this line when you implement triangles
-       throw new NotImplementedException("Triangles not implemented yet");
+    }
+    
+    float[] ComputeUV(PVector a, PVector b, PVector c, PVector p)
+    {
+      float[] result = new float[2];
+      PVector e = PVector.sub(b,a);
+      PVector g = PVector.sub(c,a);
+      PVector d = PVector.sub(p,a);
+      float denom = (PVector.dot(e,e) * PVector.dot(g,g)) - (PVector.dot(e,g) * PVector.dot(g,e));
+      result[0] = ((PVector.dot(g,g)*PVector.dot(d,e)) - (PVector.dot(e,g) * PVector.dot(d,g)))/denom;
+      result[1] = ((PVector.dot(e,e) * PVector.dot(d,g)) - (PVector.dot(e,g) * PVector.dot(d,e)))/denom;
+      return result;
     }
     
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
-        return result;
-    }
+        //compute if the ray intersects the plane...
+        PVector d = r.direction;
+        PVector o = r.origin;
+        float dir = PVector.dot(d,this.normal);
+        float numerator = PVector.dot(PVector.sub(this.v1, o),this.normal);
+        
+        //ray is orthogonal to the plane of the triangle
+        if(dir == 0)
+        {
+          return result;
+        }
+        float t = numerator/dir;
+        //ray will never hit the plane, it's facing the other way.
+        if (t < 0)
+        {
+          return result;
+        }
+        
+       //ray hits triangle plane
+       else
+       {
+          PVector location = PVector.add(o, PVector.mult(d, t));
+          RayHit ray;
+          if(dir <= 0)
+          {
+            //entry
+            ray = new RayHit(t, location, this.normal, true, this.material, 0, 0);
+          }
+          else
+          {
+            //exit
+            ray = new RayHit(t, location, PVector.mult(this.normal, -1), false, this.material, 0, 0);
+          }
+          float[] vals = ComputeUV(this.v1, this.v2, this.v3, location);
+          float u = vals[0], v = vals[1];
+          
+          //ray hits the triangle
+          if(u >= 0 && v >= 0 && (u+v) <= 1)
+          {
+             result.add(ray);
+             return result;
+          }
+          
+          //ray does not hit the triangle
+          return result;
+      }  
+  }
 }
 
 class Cylinder implements SceneObject
