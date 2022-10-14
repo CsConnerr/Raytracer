@@ -49,16 +49,16 @@ class Sphere implements SceneObject
         {
           if(t1 < 0)
           {
-            PVector entry = PVector.add(o,PVector.mult(d,t2));
-            PVector entrynorm = PVector.sub(entry,this.center).normalize();
-            result.add(new RayHit(t2,entry,entrynorm,true,this.material,0,0));
+            PVector exit = PVector.add(o,PVector.mult(d,t2));
+            PVector exitnorm = PVector.sub(exit,this.center).normalize();
+            result.add(new RayHit(t2,exit,exitnorm,false,this.material,0,0));
             return result;
           }
           else
           {
-            PVector entry = PVector.add(o,PVector.mult(d,t1));
-            PVector entrynorm = PVector.sub(entry,this.center).normalize();
-            result.add(new RayHit(t2,entry,entrynorm,true,this.material,0,0));
+            PVector exit = PVector.add(o,PVector.mult(d,t1));
+            PVector exitnorm = PVector.sub(exit,this.center).normalize();
+            result.add(new RayHit(t1,exit,exitnorm,false,this.material,0,0));
             return result;  
           }
         }
