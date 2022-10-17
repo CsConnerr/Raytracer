@@ -18,45 +18,123 @@ class Union implements SceneObject
   Union(SceneObject[] children)
   {
     this.children = children;
-    // remove this line when you implement true unions
-    println("WARNING: Using 'fake' union");
   }
 
   ArrayList<RayHit> intersect(Ray r)
   {
-     
-     ArrayList<RayHit> hits = new ArrayList<RayHit>();
-     
-     // Reminder: this is *not* a true union
-     // For a true union, you need to ensure that enter-
-     // and exit-hits alternate
-     for (SceneObject sc : children)
-     {
-       hits.addAll(sc.intersect(r));
-     }
-     hits.sort(new HitCompare());
-     return hits;
+      ArrayList<RayHit> hits = new ArrayList<RayHit>();
+      ArrayList<RayHit> trueHits = new ArrayList<RayHit>();
+      int depth = 0;
+      for (SceneObject sc : children)
+      {
+        //catches corner case of starting WITHIN an object
+         ArrayList<RayHit> childHit = sc.intersect(r);
+         if(childHit.size() > 0)
+         {
+             if(childHit.get(0).entry == false)
+             {
+               depth++;
+             }
+         }
+         hits.addAll(childHit);
+      }
+      //sorts all hits based on t value
+      hits.sort(new HitCompare());
+      
+      //iterates through all hits, tracking our depth. 
+      for(int i = 0; i < hits.size(); i++)
+      {
+        //if we encounter an entry AND our depth is 0, its a true entry hit
+        if(hits.get(i).entry == true)
+        {
+          if(depth == 0)
+          {
+            trueHits.add(hits.get(i));
+            depth++;
+          }
+          else
+          {
+            depth++;
+          }
+        }
+        //if we encounter an exit AND our depth is 1, then its a true exit hit
+        else
+        {
+          if(depth == 1)
+          {
+            trueHits.add(hits.get(i));
+            depth--;
+          }
+          else
+          {
+            depth--;
+          }
+        }
+      }
+      return trueHits;
   }
   
 }
 
 class Intersection implements SceneObject
 {
-  SceneObject[] elements;
-  Intersection(SceneObject[] elements)
+  SceneObject[] children;
+  Intersection(SceneObject[] children)
   {
-    this.elements = elements;
-    
-    // remove this line when you implement intersection
-    throw new NotImplementedException("CSG Operation: Intersection not implemented yet");
+    this.children = children;
   }
-  
-  
   ArrayList<RayHit> intersect(Ray r)
   {
-     ArrayList<RayHit> hits = new ArrayList<RayHit>();
-     
-     return hits;
+      ArrayList<RayHit> hits = new ArrayList<RayHit>();
+      ArrayList<RayHit> trueHits = new ArrayList<RayHit>();
+      int depth = 0;
+      for (SceneObject sc : children)
+      {
+         ArrayList<RayHit> childHit = sc.intersect(r);
+         if(childHit.size() > 0)
+         {
+             if(childHit.get(0).entry == false)
+             {
+               depth++;
+             }
+         }
+         hits.addAll(childHit);
+      }
+      hits.sort(new HitCompare());
+      
+      //iterate through all RayHit objects
+      boolean nextHit = false;
+      for(int i = 0; i < hits.size(); i++)
+      {
+        //if we encounter an entry AND our depth is how many children there is, its a true entry hit
+        if(hits.get(i).entry == true && !nextHit)
+        {
+          if(depth == (children.length-1))
+          {
+            trueHits.add(hits.get(i));
+            nextHit = true;
+            depth++;
+          }
+          else
+          {
+            depth++;
+          }
+        }
+        //if we encounter an exit AND we added an entry, then its a true exit hit
+        else
+        {
+          if(nextHit)
+          {
+            trueHits.add(hits.get(i));
+            break;
+          }
+          else
+          {
+            depth--;
+          }
+        }
+      }
+      return trueHits;
   }
   
 }
@@ -69,15 +147,42 @@ class Difference implements SceneObject
   {
     this.a = a;
     this.b = b;
-    
-    // remove this line when you implement difference
-    throw new NotImplementedException("CSG Operation: Difference not implemented yet");
   }
   
   ArrayList<RayHit> intersect(Ray r)
   {
+     ArrayList<RayHit> hits = new ArrayList<RayHit>();
      
-     return null;
+     //state booleans, and preliminary check to see if we started within a or b or both
+     boolean inA, inB;
+     ArrayList<RayHit> aHit = a.intersect(r);
+     ArrayList<RayHit> bHit = b.intersect(r);
+     if(aHit.size() > 0)
+     {
+         if(aHit.get(0).entry == false)
+         {
+           inA = true;
+         }
+     }
+     if(bHit.size() > 0)
+     {
+         if(bHit.get(0).entry == false)
+         {
+           inB = true;
+         }
+     }
+     
+     //push all RayHits into a sorted list based on t
+     hits.addAll(a.intersect(r));
+     hits.addAll(b.intersect(r));
+     hits.sort(new HitCompare());
+     
+     //iterate over list
+     for(int i = 0; i < hits.size(); i++)
+     {
+       
+     }
+     return hits;
   }
   
 }

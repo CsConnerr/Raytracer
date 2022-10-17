@@ -104,6 +104,10 @@ class Plane implements SceneObject
         //ray is orthogonal to the plane, no hit
         if(dir == 0)
         {
+          if(PVector.dot(PVector.sub(o,this.center),this.normal) <= 0)
+          {
+            result.add(new RayHit(Float.POSITIVE_INFINITY, new PVector(0,0,0),this.normal, false, this.material, 0, 0));
+          }
           return result;
         }
         
@@ -111,6 +115,10 @@ class Plane implements SceneObject
         //ray will never hit the plane, facing the other way.
         if (t < 0)
         {
+          if(dir <= 0)
+          {
+            result.add(new RayHit(Float.POSITIVE_INFINITY, new PVector(0,0,0), this.normal, false, this.material, 0, 0));
+          }
           return result;
         }
         //it hits

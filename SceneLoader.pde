@@ -9,7 +9,7 @@ Scene loadScene(String path)
   result.lighting = makeLightingModel(obj.getJSONObject("lighting")); 
   result.reflections = obj.getInt("reflections", 0);
   result.background = makeColor(obj.getJSONObject("background"), color(128));
-  result.camera = makeVector(obj.getJSONObject("camera"), new PVector(50,50,50));
+  result.camera = makeVector(obj.getJSONObject("camera"), new PVector(0,0,0));
   result.view = makeVector(obj.getJSONObject("view"), new PVector(0,1,0)).normalize();
   result.fov = radians(obj.getFloat("fov", 90));
   return result;
