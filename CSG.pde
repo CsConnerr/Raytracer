@@ -151,18 +151,36 @@ class Difference implements SceneObject
   
   ArrayList<RayHit> intersect(Ray r)
   {
+     //we will return hits
      ArrayList<RayHit> hits = new ArrayList<RayHit>();
      
-     //state booleans, and preliminary check to see if we started within a or b or both
-     boolean inA, inB;
+     //state booleans to determine which volumes we are in and keep track of our iterations
+     boolean inA = false, inB = false, endofA = false, endofB = false;
+     
+     //boolean to track if a rayhit is from a or not
+     boolean Ahit; 
+     
+     //holder for current processed ray
+     RayHit curr;
+     
+     //iterators for A and B
+     int iterA = 0, iterB = 0;
+     
+     //get A and B into an array list and determine if we start in one of the bodies or not.
      ArrayList<RayHit> aHit = a.intersect(r);
      ArrayList<RayHit> bHit = b.intersect(r);
+     aHit.sort(new HitCompare());
+     bHit.sort(new HitCompare());
      if(aHit.size() > 0)
      {
          if(aHit.get(0).entry == false)
          {
            inA = true;
          }
+     }
+     else
+     {
+       endofA = true;
      }
      if(bHit.size() > 0)
      {
@@ -171,18 +189,120 @@ class Difference implements SceneObject
            inB = true;
          }
      }
-     
-     //push all RayHits into a sorted list based on t
-     hits.addAll(a.intersect(r));
-     hits.addAll(b.intersect(r));
-     hits.sort(new HitCompare());
-     
-     //iterate over list
-     for(int i = 0; i < hits.size(); i++)
+     else
      {
+       endofB = true;
+     }
+     //while theres still values to iterate through the arrays
+     while(!endofA || !endofB)
+     {
+       //if we iterated through all of A already, then the ray is just B
+       if(endofA)
+       {
+         Ahit = false;
+         curr = bHit.get(iterB++);
+         if(iterB == bHit.size())
+         {
+           endofB = true;
+         }
+       }
+       //if we iterated through all of B already, then the ray is just A
+       else if(endofB)
+       {
+         Ahit = true;
+         curr = aHit.get(iterA++);
+         if(iterA == aHit.size())
+         {
+           endofA = true;
+         }
+       }
+       else
+       {
+         //our next A hit is closer than B
+         if(aHit.get(iterA).t <= bHit.get(iterB).t)
+         {
+           Ahit = true;
+           curr = aHit.get(iterA++);
+           if(iterA == aHit.size())
+           {
+             endofA = true;
+           }
+         }
+         //our next B hit is closer than A
+         else
+         {
+           Ahit = false;
+           curr = bHit.get(iterB++);
+           if(iterB == bHit.size())
+           {
+             endofB = true;
+           }
+         }
+       }
        
+       //we are exiting a volume
+       if(curr.entry == false)
+       {
+         //we are in both A and B
+         if(inA && inB)
+         {
+           //if we are leaving A
+           if(Ahit)
+           {
+             inA = false;
+           }
+           //if we are leaving B
+           else
+           {
+             curr.normal = PVector.mult(curr.normal, -1);
+             curr.entry = true;
+             hits.add(curr);
+             inB = false;
+           }
+         }
+         //if we are only in A and not B and leave A
+         else if(inA && !inB)
+         {
+             hits.add(curr);
+             inA = false;
+         }
+         //if we are only in B and not A and we leave B
+         else
+         {
+           inB = false;
+         }
+       }
+       //we are entering a volume
+       else
+       {
+         //if we're in neither body
+         if(!inA && !inB)
+         {
+           if(Ahit)
+            {
+              hits.add(curr);
+              inA = true;
+            }
+            else
+            {
+              inB = true;
+            }
+         }
+         //if we're inB and we enter A
+         else if(inB && !inA)
+         {
+           inA = true;
+         }
+         //if we're inA and we enter B
+         else
+         {
+           curr.normal = PVector.mult(curr.normal, -1);
+           curr.entry = false;
+           hits.add(curr);
+           inB = true;
+         }
+       }
      }
      return hits;
   }
-  
 }
