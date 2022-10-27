@@ -126,7 +126,8 @@ class Intersection implements SceneObject
           if(nextHit)
           {
             trueHits.add(hits.get(i));
-            break;
+            nextHit = false;
+            depth--;
           }
           else
           {

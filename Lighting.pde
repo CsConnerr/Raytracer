@@ -50,18 +50,65 @@ class PhongLightingModel extends LightingModel
 {
     color ambient;
     boolean withshadow;
+    
     PhongLightingModel(ArrayList<Light> lights, boolean withshadow, color ambient)
     {
       super(lights);
       this.withshadow = withshadow;
       this.ambient = ambient;
-      
-      // remove this line when you implement phong lighting
-      throw new NotImplementedException("Phong Lighting Model not implemented yet");
     }
+    
     color getColor(RayHit hit, Scene sc, PVector viewer)
     {
-      return hit.material.getColor(hit.u, hit.v);
+      //all vectors to be used in Phong Calculations
+      PVector R;
+      PVector L;
+      PVector V = PVector.sub(viewer,hit.location).normalize();
+      PVector N = hit.normal;
+      
+      //easier to access hits material properties 
+      MaterialProperties hitMatProp = hit.material.properties;
+      Material hitMat = hit.material;
+      color Color = hitMat.getColor(hit.u, hit.v);
+      color Shine;
+      color Spec;
+      color sum = multColor(scaleColor(Color, ambient), hitMatProp.ka);
+      for(Light l : lights)
+      {
+        //Vector Setup
+        L = PVector.sub(l.position, hit.location).normalize();
+        //2N(N*L)
+        R = PVector.mult(N, (2*PVector.dot(N,L)));
+        R = PVector.sub(R,L).normalize();
+        
+        
+        //shoot ray from hit location to current light
+        Ray r = new Ray(PVector.add(hit.location,PVector.mult(L,EPS)),L);
+        ArrayList<RayHit> reflectHits = sc.root.intersect(r);
+        
+        //if it hits something
+        if(reflectHits.size() != 0)
+        {
+          //take the first hit, if its closer than our light, don't include this light's shine and spec CONTINUE
+          RayHit reflectHit = reflectHits.get(0);
+          if(reflectHit.t <= PVector.sub(l.position,hit.location).mag())
+          {
+            continue;
+          }
+        }
+        
+        //l.shine() is i_d, kd is kd of material, result is i_d*kd
+        Shine = multColor(l.shine(Color), hitMatProp.kd);
+        
+        //This takes the dot product of the vector toward the light and the norm and multiplies it to i_d*k_d giving our final shine comp
+        Shine = multColor(Shine,PVector.dot(L,N));
+        
+        //l.spec() is i_s, ks is ks of material, result is i_s*ks
+        Spec = multColor(l.spec(Color),hitMatProp.ks);
+        Spec = multColor(Spec,pow(PVector.dot(R,V),hitMatProp.alpha));
+        sum = addColors(sum,addColors(Spec,Shine));
+      }
+      return sum;
     }
   
 }
