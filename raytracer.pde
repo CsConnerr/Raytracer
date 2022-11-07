@@ -150,28 +150,35 @@ class RayTracer
         return scene.lighting.getColor(hits.get(0), scene, ray.origin);
       }
       return scene.background;
-     if (scene.reflections > 0)
+      
+   /* if(scene.reflections > 0)
+    {
+      int counter = 0;
+      while(hits.get(0).material.properties.reflectiveness > 0 && counter < scene.reflections)
       {
-         while(hit.material.properties.reflectiveness > 0)
-         {
-          PVector R;
-          PVector N = hit.normal;
-          PVector V = PVector.sub(ray.origin, hit.position).normalize();
-          PVector L = PVector.sub(scene.light.position, hit.position).normalize();
-          L = PVector.sub(light.position, hit.position).normalize();
-          R = PVector.sub(PVector.mult(N, 2*PVector.dot(N, L)), L);
-          
-          Ray reflectionRay = new Ray(PVector.add(hit.location,PVector.mult(L,EPS)),L);
-          ArrayList<RayHit> reflectionHits = scene.root.intersect(reflectionRay);
-          if(reflectionHits.size() > 0 || scene.reflections > reflections)
-          {
-            RayHit reflectionHit = reflectionHits.get(0);
-            color Color1 = hit.material.getColor(hit, scene, ray.origin);
-            color Color2 = scene.lighting.getColor(reflectionHit, scene, reflectionRay.origin);
-            return lerpColor(Color1, Color2, hit.material.properties.reflectiveness);
-          
-            }
-            return scene.background;
+        PVector R;
+        PVector V;
+        PVector N = hits.normal;
+
+        //Vector Setup
+        V = PVector.sub(direction, hits).normalize();
+        //2N(N*L)
+        R = PVector.mult(V, (2 * PVector.dot(N, V)));
+        R = PVector.sub(R, V).normalize();
+
+        Ray refHits = new Ray(PVector.add(hits.direction, PVector.mult(V, EPS)), V);
+        ArrayList<RayHit> reHits = scene.root.intersect(refHits);
+// result is the color of the first hit
+        color c1 = Hits.get(counter).material.color;
+        // newhit color is the color of the second hit
+        color c2 = Hits.get(1 + counter).material.color;
+        float oldReflectiveness = hits.get(counter).material.properties.reflectiveness;
+        color result = lerpColor(c1, c2, oldReflectiveness);
+        counter++;
+        return result;
       }
     }
-    }
+
+    return this.scene.background; */
+  }
+}
