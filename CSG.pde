@@ -29,13 +29,6 @@ class Union implements SceneObject
       {
         //catches corner case of starting WITHIN an object
          ArrayList<RayHit> childHit = sc.intersect(r);
-         if(childHit.size() > 0)
-         {
-             if(childHit.get(0).entry == false)
-             {
-               depth++;
-             }
-         }
          hits.addAll(childHit);
       }
       //sorts all hits based on t value

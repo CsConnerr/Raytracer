@@ -3,14 +3,22 @@ class Sphere implements SceneObject
     PVector center;
     float radius;
     Material material;
-    
+
     Sphere(PVector center, float radius, Material material)
     {
        this.center = center;
        this.radius = radius;
        this.material = material;
     }
-    
+
+    float[] calculateUV(PVector n)
+    {
+      float u = 0.5 + (atan2(n.y,n.x)/(2*PI));
+      float v = 0.5 - (asin(n.z)/PI);
+      float[] results = {u,v};
+      return results;
+    }
+
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
@@ -19,7 +27,8 @@ class Sphere implements SceneObject
         float tp = PVector.dot(PVector.sub(this.center, r.origin),d); // (c-o) * d
         PVector p = PVector.add(o, PVector.mult(d,tp));
         float x = PVector.sub(this.center, p).mag();
-        
+        float[] coords;
+
         //if x is greater than radius, no hit
         if(x > this.radius)
         {
@@ -31,14 +40,15 @@ class Sphere implements SceneObject
             //t1 = t2 = tp
             PVector entry = PVector.add(o,PVector.mult(d,tp));
             PVector entrynorm = PVector.sub(entry,this.center).normalize();
-            result.add(new RayHit(tp,entry,entrynorm,true,this.material,0,0));
+            coords = calculateUV(entrynorm);
+            result.add(new RayHit(tp,entry,entrynorm,true,this.material,coords[0],coords[1]));
             return result;
         }
-        
+
         //if x isn't greater than radius...
         float t1 = tp - sqrt(pow(this.radius,2) - pow(x,2));
         float t2 = tp + sqrt(pow(this.radius,2) - pow(x,2));
-        
+
         //it hits, but its behind the camera, so we dont care
         if(t1 < 0 && t2 < 0)
         {
@@ -51,15 +61,17 @@ class Sphere implements SceneObject
           {
             PVector exit = PVector.add(o,PVector.mult(d,t2));
             PVector exitnorm = PVector.sub(exit,this.center).normalize();
-            result.add(new RayHit(t2,exit,exitnorm,false,this.material,0,0));
+            coords = calculateUV(exitnorm);
+            result.add(new RayHit(t2,exit,exitnorm,false,this.material,coords[0],coords[1]));
             return result;
           }
           else
           {
             PVector exit = PVector.add(o,PVector.mult(d,t1));
             PVector exitnorm = PVector.sub(exit,this.center).normalize();
-            result.add(new RayHit(t1,exit,exitnorm,false,this.material,0,0));
-            return result;  
+            coords = calculateUV(exitnorm);
+            result.add(new RayHit(t1,exit,exitnorm,false,this.material,coords[0],coords[1]));
+            return result;
           }
         }
         //it's a standard hit with entry and exit
@@ -69,8 +81,10 @@ class Sphere implements SceneObject
             PVector exit = PVector.add(o,PVector.mult(d,t2));
             PVector entrynorm = PVector.sub(entry,this.center).normalize();
             PVector exitnorm = PVector.sub(exit,this.center).normalize();
-            result.add(new RayHit(t1,entry,entrynorm,true,this.material,0,0));
-            result.add(new RayHit(t2,exit,exitnorm,false,this.material,0,0));
+            coords = calculateUV(entrynorm);
+            result.add(new RayHit(t1,entry,entrynorm,true,this.material,coords[0],coords[1]));
+            coords = calculateUV(exitnorm);
+            result.add(new RayHit(t2,exit,exitnorm,false,this.material,coords[0],coords[1]));
             return result;
         }
     }
@@ -82,9 +96,7 @@ class Plane implements SceneObject
     PVector normal;
     float scale;
     Material material;
-    PVector left;
-    PVector up;
-    
+
     Plane(PVector center, PVector normal, Material material, float scale)
     {
        this.center = center;
@@ -92,7 +104,7 @@ class Plane implements SceneObject
        this.material = material;
        this.scale = scale;
     }
-    
+
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
@@ -100,8 +112,8 @@ class Plane implements SceneObject
         PVector o = r.origin;
         float dir = PVector.dot(d,this.normal);
         float numerator = PVector.dot(PVector.sub(this.center, o),this.normal);
-        
-        //ray is orthogonal to the plane, no hit
+
+        //ray is orthogonal to the plane, no hit. RETURN FAKE HIT
         if(dir == 0)
         {
           if(PVector.dot(PVector.sub(o,this.center),this.normal) <= 0)
@@ -110,9 +122,9 @@ class Plane implements SceneObject
           }
           return result;
         }
-        
+
         float t = numerator/dir;
-        //ray will never hit the plane, facing the other way.
+        //ray will never hit the plane, facing the other way. RETURN FAKE HIT
         if (t < 0)
         {
           if(dir <= 0)
@@ -124,17 +136,44 @@ class Plane implements SceneObject
         //it hits
         else
         {
+
           PVector location = PVector.add(o, PVector.mult(d, t));
+          PVector D = PVector.sub(location,this.center);
+          PVector axis = new PVector(0,0,1);
           if(dir <= 0)
           {
             //entry
-            result.add(new RayHit(t, location, this.normal, true, this.material, 0, 0));
+            PVector N = this.normal;
+            PVector R = axis.cross(N).normalize();
+            if(R.mag() < EPS)
+            {
+              axis = new PVector(0,1,0);
+              R = axis.cross(N).normalize();
+            }
+            PVector U = N.cross(R).normalize();
+            float x = PVector.dot(D,R)/this.scale;
+            float y = PVector.dot(D,U)/this.scale;
+            float u = x - floor(x);
+            float v = -y - floor(-y);
+            result.add(new RayHit(t, location, N, true, this.material, u, v));
             return result;
           }
           else
           {
             //exit
-            result.add(new RayHit(t, location, PVector.mult(this.normal, -1), false, this.material, 0, 0));
+            PVector N = PVector.mult(this.normal, -1);
+            PVector R = axis.cross(N).normalize();
+            if(R.mag() < EPS)
+            {
+              axis = new PVector(0,1,0);
+              R = axis.cross(N).normalize();
+            }
+            PVector U = N.cross(R).normalize();
+            float x = PVector.dot(D,R)/this.scale;
+            float y = PVector.dot(D,U)/this.scale;
+            float u = x - floor(x);
+            float v = -y - floor(-y);
+            result.add(new RayHit(t, location, N, false, this.material, u, v));
             return result;
           }
         }
@@ -151,7 +190,7 @@ class Triangle implements SceneObject
     PVector tex2;
     PVector tex3;
     Material material;
-    
+
     Triangle(PVector v1, PVector v2, PVector v3, PVector tex1, PVector tex2, PVector tex3, Material material)
     {
        this.v1 = v1;
@@ -163,7 +202,7 @@ class Triangle implements SceneObject
        this.normal = PVector.sub(v2, v1).cross(PVector.sub(v3, v1)).normalize();
        this.material = material;
     }
-    
+
     float[] ComputeUV(PVector a, PVector b, PVector c, PVector p)
     {
       float[] result = new float[2];
@@ -175,7 +214,17 @@ class Triangle implements SceneObject
       result[1] = ((PVector.dot(e,e) * PVector.dot(d,g)) - (PVector.dot(e,g) * PVector.dot(d,e)))/denom;
       return result;
     }
-    
+
+    PVector computeTexCoords(float theta, float phi)
+    {
+      PVector result;
+      float psi = 1 - (theta + phi);
+      result = PVector.mult(tex2,theta);
+      result = PVector.add(result,PVector.mult(tex3,phi));
+      result = PVector.add(result,PVector.mult(tex1,psi));
+      return result;
+    }
+
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
@@ -184,68 +233,72 @@ class Triangle implements SceneObject
         PVector o = r.origin;
         float dir = PVector.dot(d,this.normal);
         float numerator = PVector.dot(PVector.sub(this.v1, o),this.normal);
-        
+
         //ray is orthogonal to the plane of the triangle
         if(dir == 0)
         {
-          return result;
+            return result;
         }
         float t = numerator/dir;
         //ray will never hit the plane, it's facing the other way.
         if (t < 0)
         {
-          return result;
+            return result;
         }
-        
+
        //ray hits triangle plane
        else
        {
           PVector location = PVector.add(o, PVector.mult(d, t));
           RayHit ray;
+          float[] vals = ComputeUV(this.v1, this.v2, this.v3, location);
+          float u = vals[0], v = vals[1];
+          PVector N;
+          boolean entry;
           if(dir <= 0)
           {
-            //entry
-            ray = new RayHit(t, location, this.normal, true, this.material, 0, 0);
+            N = this.normal;
+            entry = true;
           }
           else
           {
             //exit
-            ray = new RayHit(t, location, PVector.mult(this.normal, -1), false, this.material, 0, 0);
+            N = PVector.mult(this.normal,-1);
+            entry = false;
           }
-          float[] vals = ComputeUV(this.v1, this.v2, this.v3, location);
-          float u = vals[0], v = vals[1];
-          
+
           //ray hits the triangle
           if(u >= 0 && v >= 0 && (u+v) <= 1)
           {
+             PVector res = computeTexCoords(u,v);
+             ray = new RayHit(t,location,N,entry,this.material,res.x,res.y);
              result.add(ray);
              return result;
           }
-          
+
           //ray does not hit the triangle
           return result;
-      }  
+      }
   }
 }
-
 class Cylinder implements SceneObject
 {
     float radius;
     float height;
     Material material;
     float scale;
-    
+
     Cylinder(float radius, Material mat, float scale)
     {
        this.radius = radius;
        this.height = -1;
        this.material = mat;
        this.scale = scale;
-       
+
        // remove this line when you implement cylinders
        throw new NotImplementedException("Cylinders not implemented yet");
     }
-    
+
     Cylinder(float radius, float height, Material mat, float scale)
     {
        this.radius = radius;
@@ -253,7 +306,7 @@ class Cylinder implements SceneObject
        this.material = mat;
        this.scale = scale;
     }
-    
+
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
@@ -265,60 +318,60 @@ class Cone implements SceneObject
 {
     Material material;
     float scale;
-    
+
     Cone(Material mat, float scale)
     {
         this.material = mat;
         this.scale = scale;
-        
+
         // remove this line when you implement cones
        throw new NotImplementedException("Cones not implemented yet");
     }
-    
+
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
         return result;
     }
-   
+
 }
 
 class Paraboloid implements SceneObject
 {
     Material material;
     float scale;
-    
+
     Paraboloid(Material mat, float scale)
     {
         this.material = mat;
         this.scale = scale;
-        
+
         // remove this line when you implement paraboloids
        throw new NotImplementedException("Paraboloid not implemented yet");
     }
-    
+
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
         return result;
     }
-   
+
 }
 
 class HyperboloidOneSheet implements SceneObject
 {
     Material material;
     float scale;
-    
+
     HyperboloidOneSheet(Material mat, float scale)
     {
         this.material = mat;
         this.scale = scale;
-        
+
         // remove this line when you implement one-sheet hyperboloids
         throw new NotImplementedException("Hyperboloids of one sheet not implemented yet");
     }
-  
+
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
@@ -330,16 +383,16 @@ class HyperboloidTwoSheet implements SceneObject
 {
     Material material;
     float scale;
-    
+
     HyperboloidTwoSheet(Material mat, float scale)
     {
         this.material = mat;
         this.scale = scale;
-        
+
         // remove this line when you implement two-sheet hyperboloids
         throw new NotImplementedException("Hyperboloids of two sheets not implemented yet");
     }
-    
+
     ArrayList<RayHit> intersect(Ray r)
     {
         ArrayList<RayHit> result = new ArrayList<RayHit>();
