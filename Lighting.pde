@@ -83,16 +83,25 @@ class PhongLightingModel extends LightingModel
 
 
         //shoot ray from hit location to current light
-        Ray r = new Ray(PVector.add(hit.location,PVector.mult(L,EPS)),L);
-        ArrayList<RayHit> reflectHits = sc.root.intersect(r);
-
-        //if it hits something
-        if(reflectHits.size() != 0)
+        if(withshadow)
         {
-          //take the first hit, if its closer than our light, don't include this light's shine and spec CONTINUE
-          if(reflectHits.get(0).t <= PVector.sub(l.position,hit.location).mag())
+          //check if the light source is behind the object
+          if(PVector.dot(hit.normal,L) < 0)
           {
+            //light is behind the object, so we don't care
             continue;
+          }
+          Ray r = new Ray(PVector.add(hit.location,PVector.mult(L,EPS)),L);
+          ArrayList<RayHit> reflectHits = sc.root.intersect(r);
+  
+          //if it hits something
+          if(reflectHits.size() != 0)
+          {
+            //take the first hit, if its closer than our light, don't include this light's shine and spec CONTINUE
+            if(reflectHits.get(0).t <= PVector.sub(l.position,hit.location).mag())
+            {
+              continue;
+            }
           }
         }
 

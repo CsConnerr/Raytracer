@@ -96,16 +96,14 @@ class Intersection implements SceneObject
       hits.sort(new HitCompare());
       
       //iterate through all RayHit objects
-      boolean nextHit = false;
       for(int i = 0; i < hits.size(); i++)
       {
         //if we encounter an entry AND our depth is how many children there is, its a true entry hit
-        if(hits.get(i).entry == true && !nextHit)
+        if(hits.get(i).entry == true)
         {
           if(depth == (children.length-1))
           {
             trueHits.add(hits.get(i));
-            nextHit = true;
             depth++;
           }
           else
@@ -116,10 +114,9 @@ class Intersection implements SceneObject
         //if we encounter an exit AND we added an entry, then its a true exit hit
         else
         {
-          if(nextHit)
+          if(depth == children.length)
           {
             trueHits.add(hits.get(i));
-            nextHit = false;
             depth--;
           }
           else

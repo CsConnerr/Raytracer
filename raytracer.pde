@@ -1,5 +1,5 @@
-String input =  "data/tests/milestone4/test13.json";
-String output = "data/tests/milestone4/test13.png";
+String input =  "data/tests/submission3tests/submission3/test13.json";
+String output = "data/tests/submission3tests/submission3/test13.png";
 
 int repeat = 0;
 
@@ -144,7 +144,7 @@ class RayTracer
     //if it hits something, then get its color
     if (hits.size() > 0)
     {
-      //get first reflection ray
+      //get first reflection ray and initialize color to first object hit
       color result = scene.lighting.getColor(hits.get(0), scene, origin);
       PVector V = PVector.mult(direction,-1);
       PVector N = hits.get(0).normal;
@@ -170,6 +170,7 @@ class RayTracer
       }
       
       //start reflecting unless our first hit was empty, or it was a reflection index of 0
+      //loop until we hit max reflections
       while (reflectHits.size() > 0 && prevShine > 0 && refCounter <= scene.reflections)
       {
         //reverse the direction of our reflection ray
