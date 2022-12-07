@@ -1,0 +1,23 @@
+{
+   "scene": {"type": "union",
+             "children": [
+                 {"type": "sphere",
+                  "radius": 4,
+                  "center": {"z": 0, "y": 10},
+                  "material": {"type": "textured", "texture": "MasterT.png", "reflectiveness": 0.6}
+                 },
+               {"type": "triangle",
+       "v3": {"x": 100, "y": 200, "z": -100},
+                      "v1": {"x": 100, "y": 200, "z": 100},
+                      "v2": {"x": -100, "y": 200, "z": 100},
+                "material": {"color": {"r": 138, "g":43, "b": 226}}
+                }
+            ]},
+   "camera": {"x": 0, "y": 0, "z": 0},
+   "view": {"x": 0, "y": 1, "z": 0},
+   "background": {"white": 100},
+   "fov": 50,
+   "reflections": 1,
+   "lighting": {"type": "basic", "lights": [{"position": {"x": -3, "y": -2, "z": 05}, "color": {"r":236, "g": 155, "b":254}}]}
+}
+

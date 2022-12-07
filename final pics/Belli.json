@@ -1,0 +1,40 @@
+ {
+   "scene": {
+             "type": "union",
+             "children": [
+                 {"type": "sphere",
+                  "radius": 150,
+                  "center": {"x": 0, "y": 250, "z": -10},
+                  "material": {"type": "textured", "texture": "2.png"}},
+            
+                     {"type": "sphere",
+                      "radius": 60,
+                      "center": {"x": 0, "y": 130, "z": -15},
+                      "material": {"color": {"r": 220, "g": 220 , "b": 220}}},
+                     {"type": "sphere",
+                      "radius": 20,
+                      "center": {"x": 0, "y": 80, "z": -15},
+                      "material": {"type": "textured", "texture": "etext.jpeg"}},
+               
+                    {"type": "sphere",
+                      "radius": 20,
+                      "center": {"x": 45, "y": 130, "z": 50},
+                      "material": {"color": {"r": 255, "g": 255 , "b": 255}}},
+                    {"type": "sphere",
+                      "radius": 5,
+                      "center": {"x": 40, "y": 100, "z": 45},
+                      "material": {"color": {"r": 0, "g": 0 , "b": 0}}},
+                    {"type": "sphere",
+                      "radius": 20,
+                      "center": {"x": -45, "y": 130, "z": 50},
+                      "material": {"color": {"r": 255, "g": 255 , "b": 255}}},
+                    {"type": "sphere",
+                      "radius": 5,
+                      "center": {"x": -40, "y": 100, "z": 45},
+                      "material": {"color": {"r": 0, "g": 0 , "b": 0}}}
+                ]}
+   }
+"lighting": {"lights": [{"position": {"y": -2, "z": 0}}]}
+
+}
+}

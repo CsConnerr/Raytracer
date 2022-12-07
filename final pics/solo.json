@@ -1,0 +1,32 @@
+{
+   "scene": {
+             "type": "difference",
+             "a":
+               {"type": "sphere",
+                "radius": 135,
+                "center": {"x": 0, "y": 250, "z": 0},
+                   "material": {"color": {"r": 50, "g": 205 , "b": 50}}},
+
+             "b":
+               {"type": "union",
+                "children":
+                [
+                   {"type": "sphere",
+                    "radius": 110,
+                    "center": {"x": 0, "y": 225, "z": 0},
+                    "material": {"type": "textured", "texture": "soloT.png"}},                   {"type": "sphere",
+                    "radius": 50,
+                    "center": {"x": -30, "y": 105, "z": 0},
+                    "material": {"color": {"r": 144, "g": 238 , "b": 144}}},
+                   {"type": "sphere",
+                    "radius": 50,
+                    "center": {"x": 30, "y": 105, "z": 0},
+                    "material": {"color": {"r": 144, "g": 238 , "b": 144}}},
+               
+                ]
+               }
+            },
+   "lighting": {"lights": [{"position": {"y": -50, "z": 0}}]}
+
+                         
+}

@@ -1,0 +1,19 @@
+{
+   "scene": {"type": "union",
+             "children": [
+                 {"type": "sphere",
+                  "radius": 2,
+                  "center": {"z": -1, "y": 10},
+                  "material": {"type": "textured", "texture": "orb.png", "reflectiveness": 0.6}
+                 },
+                {"type": "plane",
+                 "scale": 2,
+                 "center": {"z": -4},
+                 "normal": {"z": 1},
+                 "material": {"type": "textured", "texture": "grass.jpg"}
+                }
+            ]},
+   "reflections": 2,
+   "lighting": {"lights": [{"position": {"y": -2, "z": 0}}]}
+}
+
