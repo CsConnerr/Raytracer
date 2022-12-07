@@ -1,6 +1,5 @@
-String input =  "data/tests/submission3tests/submission3/test13.json";
-String output = "data/tests/submission3tests/submission3/test13.png";
-
+String input =  "data/tests/submission3tests/submission3/test15.json";
+String output = "data/tests/submission3tests/submission3/test15.png";
 int repeat = 0;
 
 int iteration = 0;

@@ -125,7 +125,7 @@ class Plane implements SceneObject
 
         float t = numerator/dir;
         //ray will never hit the plane, facing the other way. RETURN FAKE HIT
-        if (t < 0)
+        if (t <= 0)
         {
           if(dir <= 0)
           {
@@ -253,26 +253,20 @@ class Triangle implements SceneObject
           RayHit ray;
           float[] vals = ComputeUV(this.v1, this.v2, this.v3, location);
           float u = vals[0], v = vals[1];
-          PVector N;
-          boolean entry;
-          if(dir <= 0)
+          if(dir >= 0)
           {
-            N = this.normal;
-            entry = true;
+            //if we are "inside" the triangle, just exit
+            return result;
           }
-          else
-          {
-            //exit
-            N = PVector.mult(this.normal,-1);
-            entry = false;
-          }
-
           //ray hits the triangle
           if(u >= 0 && v >= 0 && (u+v) <= 1)
           {
              PVector res = computeTexCoords(u,v);
-             ray = new RayHit(t,location,N,entry,this.material,res.x,res.y);
+             ray = new RayHit(t,location,this.normal,true,this.material,res.x,res.y);
+             PVector newLoc = PVector.add(o, PVector.mult(d, t + EPS));
+             RayHit thinray = new RayHit(t+EPS,newLoc, PVector.mult(this.normal,-1), false, this.material, res.x, res.y);
              result.add(ray);
+             result.add(thinray);
              return result;
           }
 
