@@ -1,11 +1,23 @@
 {
    "scene": {"type": "union",
              "children": [
+                 
                  {"type": "sphere",
                   "radius": 4,
                   "center": {"z": 0, "y": 10},
-                  "material": {"type": "textured", "texture": "MasterT.png", "reflectiveness": 0.6}
-                 },
+                  "material": {"type": "textured", "texture": "MasterT.png", "reflectiveness": 0.7}},
+                 
+                 {"type": "sphere",
+                  "radius": 2.5,
+                  "center": {"x": 1.2,"z": 1.2, "y": 9},
+                     "material": {"color": {"r": 193, "g": 80 , "b": 140, "reflectiveness": 0.7}}},
+                 
+                 {"type": "sphere",
+                  "radius": 2.5,
+                  "center": {"x": -1.2,"z": 1.2, "y": 9},
+                     "material": {"color": {"r": 193, "g": 80 , "b": 140, "reflectiveness": 0.7}}},
+                 
+                 
                {"type": "triangle",
        "v3": {"x": 100, "y": 200, "z": -100},
                       "v1": {"x": 100, "y": 200, "z": 100},
@@ -13,7 +25,7 @@
                 "material": {"color": {"r": 138, "g":43, "b": 226}}
                 }
             ]},
-   "reflections": 2,
+   "reflections": 3,
    "camera": {"x": 0, "y": 0, "z": 0},
    "view": {"x": 0, "y": 1, "z": 0},
    "background": {"r":48,"g":25,"b":52},
