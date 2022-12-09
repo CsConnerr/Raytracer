@@ -13,11 +13,16 @@
                 "material": {"color": {"r": 138, "g":43, "b": 226}}
                 }
             ]},
+   "reflections": 2,
    "camera": {"x": 0, "y": 0, "z": 0},
    "view": {"x": 0, "y": 1, "z": 0},
-   "background": {"white": 100},
-   "fov": 50,
-   "reflections": 1,
-   "lighting": {"type": "basic", "lights": [{"position": {"x": -3, "y": -2, "z": 05}, "color": {"r":236, "g": 155, "b":254}}]}
+   "background": {"r":48,"g":25,"b":52},
+   "fov": 200,
+   "lighting": {"type": "phong", "ambient": {"color": 250}, "shadows": true,
+       "lights": [{"position": {"x": -5, "y": -20, "z": 5}, "color": {"r": 0, "g": 0, "b": 158}},
+           
+           {"position": {"x": 0, "y": -5, "z": 0}, "color": {"r": 255, "g": 255, "b": 255}},
+               
+                  {"position": {"x": 5, "y": -20, "z": -5}, "color": {"r": 235, "g": 0, "b": 0}}]}
 }
-
+}

@@ -5,7 +5,7 @@
                  {"type": "sphere",
                   "radius": 150,
                   "center": {"x": 0, "y": 250, "z": -10},
-                  "material": {"type": "textured", "texture": "2.png"}},
+                  "material": {"type": "textured", "texture": "Bellit.png"}},
             
                      {"type": "sphere",
                       "radius": 60,
@@ -32,9 +32,14 @@
                       "radius": 5,
                       "center": {"x": -40, "y": 100, "z": 45},
                       "material": {"color": {"r": 0, "g": 0 , "b": 0}}}
-                ]}
-   }
-"lighting": {"lights": [{"position": {"y": -2, "z": 0}}]}
-
+                ]
+   },
+   "camera": {"x": 0, "y": 0, "z": 0},
+     "view": {"x": 0, "y": 1, "z": 0},
+     "background": {"green": 50},
+"lighting": {"type": "phong", "ambient": {"color": 250}, "shadows": true,
+              "lights": [{"position": {"x": -50, "y": -400, "z": 30}, "color": {"r": 255, "g": 255, "b": 0}},
+                    
+                         {"position": {"x": 0, "y": -400, "z": -60}, "color": {"r": 0, "g": 255, "b": 0}}]}
 }
 }

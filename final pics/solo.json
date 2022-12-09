@@ -5,7 +5,7 @@
                {"type": "sphere",
                 "radius": 135,
                 "center": {"x": 0, "y": 250, "z": 0},
-                   "material": {"color": {"r": 50, "g": 205 , "b": 50}}},
+                   "material": {"color": {"r": 50, "g": 205 , "b": 50, "reflectiveness": 0.9}}},
 
              "b":
                {"type": "union",
@@ -24,9 +24,15 @@
                     "material": {"color": {"r": 144, "g": 238 , "b": 144}}},
                
                 ]
-               }
-            },
-   "lighting": {"lights": [{"position": {"y": -50, "z": 0}}]}
+                }
+   },
+   "reflections": 2,
+   "camera": {"x": 0, "y": 0, "z": 0},
+     "view": {"x": 0, "y": 1, "z": 0},
+     "background": {"r":255,"g":192,"b":203},
+   "lighting": {"type": "phong", "ambient": {"color": 250}, "shadows": true,
+              "lights": [{"position": {"x": 0, "y": 100, "z": -60}, "color": {"r": 230, "g": 230, "b": 250}},
+              {"position": {"x": 0, "y": 110, "z": -60}, "color": {"r": 255, "g": 192, "b": 203}}]}
+   }
+   }
 
-                         
-}
